@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+    stages {
+        stage('Test Docker') {
+            steps {
+                script {
+                    docker.image('alpine').inside {
+                        sh 'pwd'
+                        sh 'echo "Hello from Docker!"'
+                    }
+                }
+            }
+        }
+    }
+}
