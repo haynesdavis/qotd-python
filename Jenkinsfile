@@ -109,7 +109,20 @@ pipeline {
                 sh '''
                 API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
                 export API_KEY
-                python UC_build_test_case.py
+                app_name="qotd-python"
+
+                PROMETHEUS_URL="http://9.30.96.66:9090"
+                QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
+                result=$(curl -v -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
+                echo $result
+                network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
+                echo "network_load is $network_load"
+                status=$(cat deployment_status.log)
+
+
+                deployment_prediction=$(python UC_pipeline_management.py $network_load)
+                echo "deployment_prediction is $deployment_prediction"
+                
                 '''
             }
         }
@@ -164,7 +177,7 @@ pipeline {
                 actual_response=$(curl -s localhost:10000)
                 echo "output is - $output"
                 PROMETHEUS_URL="http://9.30.96.66:9090"
-                QUERY='query=cpu_load_state{instance="9.46.241.25:10001", job="qotd"}'
+                QUERY='query=cpu_load_state{instance="9.46.241.25:10001", job="cpu_load"}'
                 result=$(curl -v -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
                 echo $result
                 cpu_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
