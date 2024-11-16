@@ -124,8 +124,8 @@ pipeline {
                 echo "deployment_prediction is $deployment_prediction"
                 script {
                     if (shouldStop()) {
-                        deployment_prediction = 'FAILURE'
-                        error("Stopping pipeline due to failure in Stage 1.")
+                        deployment_prediction = 'Failure'
+                        error("Stopping pipeline due to failure in Prereqs Stage.")
                     }
                 '''
             }
