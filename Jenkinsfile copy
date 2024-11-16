@@ -99,7 +99,7 @@ pipeline {
         //         sh '''
         //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
         //         export API_KEY
-        //         python UC_build_test_case.py
+        //         python UC_test_cases.py
         //         '''
         //     }
         // }
