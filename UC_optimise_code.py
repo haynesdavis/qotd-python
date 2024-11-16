@@ -22,4 +22,5 @@ sonarqube_response = requests.get(url, headers=headers)
 
 with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write(genai_response.text + '\n\n')
+    file.write("qualityGateStatus from SonarQube is as follows. Please take necessary action." + '\n')
     file.write(sonarqube_response.text)
