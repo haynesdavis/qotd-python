@@ -55,20 +55,37 @@ pipeline {
 
         stage('SCM Checkout') {
             steps{
-           git branch: 'main', url: 'https://github.com/haynesdavis/qotd-python.git'
+            git branch: 'jenkins-pipeline-test', url: 'https://github.com/haynesdavis/qotd-python.git'
+            sh 'git fetch --unshallow || true'
             }
         }
-        // run sonarqube test
-        stage('Run Sonarqube') {
+
+        stage('SonarQube Analysis') {
             environment {
-                scannerHome = tool 'SonarQubeScanner';
+                SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
             }
             steps {
-              withSonarQubeEnv(credentialsId: 'SonarQube', installationName: 'SonarQubeServer') {
-                sh "${scannerHome}/bin/sonar-scanner"
-              }
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=SmpleApp \
+                    -Dsonar.sources=src \
+                    -Dsonar.branch.name=${env.BRANCH_NAME}
+                    """
+                }
             }
         }
+                        // // run sonarqube test
+                        // stage('Run Sonarqube') {
+                        //     environment {
+                        //         scannerHome = tool 'SonarQubeScanner';
+                        //     }
+                        //     steps {
+                        //       withSonarQubeEnv(credentialsId: 'SonarQube', installationName: 'SonarQubeServer') {
+                        //         sh "${scannerHome}/bin/sonar-scanner"
+                        //       }
+                        //     }
+                        // }
                         // stage('Setup Python Environment and run app') {
                         //     steps {
                         //         // Set up Python and install dependencies
