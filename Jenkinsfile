@@ -104,6 +104,16 @@ pipeline {
             }
         }
 
+        stage('Check Prereqs for deployment') {
+            steps {
+                sh '''
+                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                export API_KEY
+                python UC_build_test_case.py
+                '''
+            }
+        }
+
         stage('Deploy the sample app') {
             steps {
                 sh '''
@@ -131,6 +141,16 @@ pipeline {
                 latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
                 current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
                 docker run -d --name $app_name -p 10000:10000 "$app_name:v$current_version"
+                if docker ps --filter "name=$app_name" --filter "status=running" | grep -q "$app_name"; then
+                echo "Container '$app_name' is running successfully."
+                deployment_status="success"
+                network_load=$(curl -s http://9.46.241.25:10002/metrics | cut -d' ' -f2)
+                status="{deployment_status: $deployment_status, data: {network_load: $network_load}}"
+                echo $status >> deployment_status.log
+                else
+                echo "Container '$app_name' is not running."
+                fi
+
                 '''
             }
         }
