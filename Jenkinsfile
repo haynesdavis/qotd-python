@@ -4,6 +4,7 @@ pipeline {
     environment {
         MY_PASSWORD = credentials('af5bdc2b-124d-44ab-a094-d04b567261b9')
         // API_KEY="test"
+        SONARQUBE_CREDS = credentials('SonarQubeBase64')
 
     }
     stages {
@@ -74,6 +75,10 @@ pipeline {
                 }
             }
         }
+
+
+
+
                         // // run sonarqube test
                         // stage('Run Sonarqube') {
                         //     environment {
@@ -143,15 +148,15 @@ pipeline {
         // }
 
 
-        // stage('Code Optimisation') {
-        //     steps {
-        //         sh '''
-        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-        //         export API_KEY
-        //         python UC_optimise_code.py 
-        //         '''
-        //     }
-        // }
+        stage('Code Optimisation') {
+            steps {
+                sh '''
+                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                export API_KEY
+                python UC_optimise_code.py $SONARQUBE_CREDS
+                '''
+            }
+        }
 
 
         // stage('Test Case Generation') {
