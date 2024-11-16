@@ -18,6 +18,9 @@ SONARQUBE_CREDS = sys.argv[1]
 url = "http://9.46.241.25:9000/api/project_branches/list?project=SmpleApp"
 headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
 
+url = "http://9.46.241.25:9000/api/project_branches/list?project=SmpleApp"
+headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
+
 sonarqube_response = requests.get(url, headers=headers)
 
 with open('/tmp/code_optimisations.txt', 'w') as file:
