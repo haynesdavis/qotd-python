@@ -11,7 +11,7 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 with open('UC_code_to_scan.py', 'r') as file:
     original_code = file.read()
 
-genai_response = model.generate_content(f"Below given is a python code. Optimise the code.\n {content} \n Add this string at the begining of response - Optimised code is")
+genai_response = model.generate_content(f"Below given is a python code. Optimise the code.\n {original_code} \n Add this string at the begining of response - Optimised code is")
 
 SONARQUBE_CREDS = sys.argv[1]
 
