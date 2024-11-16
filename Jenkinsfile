@@ -145,7 +145,7 @@ pipeline {
                         # Get network load from Prometheus
                         result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
                         network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
-                        echo "Network load is $network_load"
+                        // echo "Network load is $network_load"
 
                         # Read deployment status
                         status=$(cat deployment_status.log)
