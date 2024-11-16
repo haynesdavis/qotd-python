@@ -70,15 +70,47 @@ pipeline {
                         // }
 
 
-        stage('Code Optimisation') {
+        stage('SonarQube Code Analysis') {
             steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                python UC_optimise_code.py 
-                '''
+                dir("${WORKSPACE}"){
+                // Run SonarQube analysis for Python
+                script {
+                    def scannerHome = tool name: 'scanner-name', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withSonarQubeEnv('sonar') {
+                        sh "echo $pwd"
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
             }
         }
+        stage("SonarQube Quality Gate Check") {
+            steps {
+                script {
+                def qualityGate = waitForQualityGate()
+                    
+                    if (qualityGate.status != 'OK') {
+                        echo "${qualityGate.status}"
+                        error "Quality Gate failed: ${qualityGateStatus}"
+                    }
+                    else {
+                        echo "${qualityGate.status}"
+                        echo "SonarQube Quality Gates Passed"
+                    }
+                }
+            }
+        }
+
+
+        // stage('Code Optimisation') {
+        //     steps {
+        //         sh '''
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         python UC_optimise_code.py 
+        //         '''
+        //     }
+        // }
 
 
         // stage('Test Case Generation') {
