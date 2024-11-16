@@ -75,7 +75,7 @@ pipeline {
                 dir("${WORKSPACE}"){
                 // Run SonarQube analysis for Python
                 script {
-                    def scannerHome = tool name: 'scanner-name', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('sonar') {
                         sh "${scannerHome}/bin/sonar-scanner \
                             -D sonar.projectVersion=1.0-SNAPSHOT \
