@@ -25,5 +25,8 @@ with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write("Original code is" + '\n')
     file.write(original_code + '\n\n')
     file.write(genai_response.text + '\n\n')
-    file.write("qualityGateStatus from SonarQube is as follows. Please take necessary action." + '\n')
-    json.dump(sonarqube_response.text, file, indent=4) 
+    file.write("******* qualityGateStatus from SonarQube is as follows. Please take necessary action." + '\n')
+    file.write(sonarqube_response.text + '\n\n')
+
+
+    # json.dump(sonarqube_response.text, file, indent=4) 
