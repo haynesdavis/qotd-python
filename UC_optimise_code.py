@@ -24,12 +24,9 @@ print(sonarqube_response.text)
 parsed_data = json.loads(sonarqube_response.text)
 
 with open('/tmp/code_optimisations.txt', 'w') as file:
+    file.write("******* Code optimisation by GenAI" + '\n')
     file.write("Original code is" + '\n')
     file.write(original_code + '\n\n')
     file.write(genai_response.text + '\n\n')
     file.write("******* qualityGateStatus from SonarQube is as follows. Please take necessary action." + '\n')
-    file.write(sonarqube_response.text + '\n\n')
-
-
-with open('/tmp/code_optimisations.txt', 'a') as file:
     json.dump(parsed_data, file, indent=4) 
