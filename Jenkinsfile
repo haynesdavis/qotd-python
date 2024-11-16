@@ -174,7 +174,7 @@ pipeline {
                 sleep 30
                 app_name="qotd-python"
 
-                actual_response=$(curl -s localhost:10000)
+                app_response=$(curl -s localhost:10000)
                 echo "output is - $output"
                 PROMETHEUS_URL="http://9.30.96.66:9090"
                 QUERY='query=cpu_load_state{instance="9.46.241.25:10001", job="cpu_load"}'
@@ -186,7 +186,7 @@ pipeline {
                 expected_response="This is the response from sample app."
                 API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
                 export API_KEY
-                app_running=$(python UC_rollback_deployment.py "${cpu_load}" "${actual_response}" | sed -n '2p')
+                app_running=$(python UC_rollback_deployment.py "${cpu_load}" "${app_response}" | sed -n '2p')
 
                 
                 if $app_running; then
@@ -216,6 +216,8 @@ pipeline {
 
                     docker run -d --name $app_name -p 10000:10000 "$app_name:v$prev_version"
                 fi
+                app_response=$(curl -s localhost:10000)
+                echo $app_response
 
                 '''
             }
