@@ -1,0 +1,16 @@
+{deployment_status: failure, data: {network_load: 7}}
+{deployment_status: failure, data: {network_load: 5}}
+{deployment_status: success, data: {network_load: 4}}
+{deployment_status: failure, data: {network_load: 8}}
+{deployment_status: failure, data: {network_load: 9}}
+{deployment_status: failure, data: {network_load: 10}}
+{deployment_status: success, data: {network_load: 3}}
+{deployment_status: failure, data: {network_load: 6}}
+{deployment_status: failure, data: {network_load: 7}}
+{deployment_status: success, data: {network_load: 2}}
+{deployment_status: success, data: {network_load: 3}}
+{deployment_status: success, data: {network_load: 1}}
+{deployment_status: failure, data: {network_load: 7}}
+{deployment_status: failure, data: {network_load: 8}}
+{deployment_status: success, data: {network_load: 3}}
+{deployment_status: success, data: {network_load: 3}}

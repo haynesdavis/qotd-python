@@ -51,58 +51,58 @@ pipeline {
                 sh 'echo "Unmasked API_KEY is: $env.API_KEY" > /tmp/pss2'
             }
         }
-        // stage('Setup Python Environment and run app') {
+                        // stage('Setup Python Environment and run app') {
+                        //     steps {
+                        //         // Set up Python and install dependencies
+                        //         sh '''
+                        //         pwd
+                        //         cd qotd-python/
+                        //         pwd
+                        //         python3 -m venv venv
+                        //         source venv/bin/activate
+                        //         pip install --upgrade pip
+                        //         pip install -r requirements.txt
+                        //         gunicorn --bind 0.0.0.0:10000 app:app &
+                        //         sleep 5
+                        //         curl localhost:10000
+                        //         '''
+                        //     }
+                        // }
+        // stage('build') {
         //     steps {
-        //         // Set up Python and install dependencies
         //         sh '''
-        //         pwd
-        //         cd qotd-python/
-        //         pwd
-        //         python3 -m venv venv
-        //         source venv/bin/activate
-        //         pip install --upgrade pip
-        //         pip install -r requirements.txt
-        //         gunicorn --bind 0.0.0.0:10000 app:app &
-        //         sleep 5
-        //         curl localhost:10000
+        //         docker images
+        //         app_name="qotd-python"
+        //         latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
+        //         current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
+        //         next_version=$((current_version + 1))
+        //         sed -i "s/VERSION/$next_version/" app.py
+        //         docker build -t "$app_name:v$next_version" .
+        //         docker images
         //         '''
         //     }
         // }
-        stage('build') {
-            steps {
-                sh '''
-                docker images
-                app_name="qotd-python"
-                latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
-                current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
-                next_version=$((current_version + 1))
-                sed -i "s/VERSION/$next_version/" app.py
-                docker build -t "$app_name:v$next_version" .
-                docker images
-                '''
-            }
-        }
 
-        stage('Code Optimisation') {
-            steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                python UC_optimise_code.py 
-                '''
-            }
-        }
+        // stage('Code Optimisation') {
+        //     steps {
+        //         sh '''
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         python UC_optimise_code.py 
+        //         '''
+        //     }
+        // }
 
 
-        stage('Test Case Generation') {
-            steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                python UC_build_test_case.py
-                '''
-            }
-        }
+        // stage('Test Case Generation') {
+        //     steps {
+        //         sh '''
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         python UC_build_test_case.py
+        //         '''
+        //     }
+        // }
 
         stage('Check Prereqs for deployment') {
             steps {
