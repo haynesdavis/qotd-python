@@ -120,7 +120,7 @@ pipeline {
                 status=$(cat deployment_status.log)
 
 
-                deployment_prediction=$(python UC_pipeline_management.py $network_load)
+                deployment_prediction=$(python UC_pipeline_management.py $network_load $status)
                 echo "deployment_prediction is $deployment_prediction"
                 
                 '''
