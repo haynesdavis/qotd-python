@@ -77,13 +77,20 @@ pipeline {
                 script {
                     def scannerHome = tool name: 'scanner-name', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('sonar') {
-                        sh "echo $pwd"
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh "${scannerHome}/bin/sonar-scanner \
+                            -D sonar.projectVersion=1.0-SNAPSHOT \
+                            -D sonar.qualityProfile=<qualityprofilename> \
+                            -D sonar.projectBaseDir=/var/lib/jenkins/workspace/Snyk-Testing/snyk-code-container-scan/appcode \
+                            -D sonar.projectKey=sample-app \
+                            -D sonar.sourceEncoding=UTF-8 \
+                            -D sonar.language=python \
+                            -D sonar.host.url=http://9.46.241.25:9000"
                     }
                 }
             }
             }
         }
+
         stage("SonarQube Quality Gate Check") {
             steps {
                 script {
