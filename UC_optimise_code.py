@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 import sys
 import requests
+import json
 
 genai.configure(api_key=os.environ["API_KEY"])
 
@@ -18,9 +19,6 @@ SONARQUBE_CREDS = sys.argv[1]
 url = "http://9.46.241.25:9000/api/project_branches/list?project=SmpleApp"
 headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
 
-url = "http://9.46.241.25:9000/api/project_branches/list?project=SmpleApp"
-headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
-
 sonarqube_response = requests.get(url, headers=headers)
 
 with open('/tmp/code_optimisations.txt', 'w') as file:
@@ -28,4 +26,4 @@ with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write(original_code + '\n\n')
     file.write(genai_response.text + '\n\n')
     file.write("qualityGateStatus from SonarQube is as follows. Please take necessary action." + '\n')
-    file.write(sonarqube_response.text)
+    json.dump(sonarqube_response.text, file, indent=4) 
