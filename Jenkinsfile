@@ -153,6 +153,8 @@ pipeline {
                 sh '''
                 API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
                 export API_KEY
+                echo "this is just a test comment added to amke sure there is a code change"
+
                 python UC_optimise_code.py $SONARQUBE_CREDS
                 '''
             }

@@ -23,8 +23,6 @@ sonarqube_response = requests.get(url, headers=headers)
 print(sonarqube_response.text)
 parsed_data = json.loads(sonarqube_response.text)
 
-print("this is just a tets comment added to amke sure there is a code change")
-
 with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write("******* Code optimisation by GenAI" + '\n')
     file.write("Original code is" + '\n')
