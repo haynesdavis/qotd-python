@@ -20,7 +20,8 @@ url = "http://9.46.241.25:9000/api/hotspots/search?inNewCodePeriod=false&onlyMin
 headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
 
 sonarqube_response = requests.get(url, headers=headers)
-parsed_data = json.loads(sonarqube_response)
+print(sonarqube_response.text)
+parsed_data = json.loads(sonarqube_response.text)
 
 with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write("Original code is" + '\n')
