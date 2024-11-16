@@ -122,7 +122,11 @@ pipeline {
 
                 deployment_prediction=$(python UC_pipeline_management.py $network_load $status)
                 echo "deployment_prediction is $deployment_prediction"
-                
+                script {
+                    if (shouldStop()) {
+                        deployment_prediction = 'FAILURE'
+                        error("Stopping pipeline due to failure in Stage 1.")
+                    }
                 '''
             }
         }
@@ -216,6 +220,7 @@ pipeline {
 
                     docker run -d --name $app_name -p 10000:10000 "$app_name:v$prev_version"
                 fi
+                sleep 10
                 app_response=$(curl -s localhost:10000)
                 echo $app_response
 
