@@ -104,32 +104,70 @@ pipeline {
         //     }
         // }
 
+                        // stage('Check Prereqs for deployment') {
+                        //     steps {
+                        //         sh '''
+                        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                        //         export API_KEY
+                        //         app_name="qotd-python"
+
+                        //         PROMETHEUS_URL="http://9.30.96.66:9090"
+                        //         QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
+                        //         result=$(curl -v -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
+                        //         echo $result
+                        //         network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
+                        //         echo "network_load is $network_load"
+                        //         status=$(cat deployment_status.log)
+
+
+                        //         deployment_prediction=$(python UC_pipeline_management.py $network_load $status)
+                        //         echo "deployment_prediction is $deployment_prediction"
+                        //         '''
+                        //     }
+                        // }
+
+
         stage('Check Prereqs for deployment') {
             steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                app_name="qotd-python"
-
-                PROMETHEUS_URL="http://9.30.96.66:9090"
-                QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
-                result=$(curl -v -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
-                echo $result
-                network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
-                echo "network_load is $network_load"
-                status=$(cat deployment_status.log)
-
-
-                deployment_prediction=$(python UC_pipeline_management.py $network_load $status)
-                echo "deployment_prediction is $deployment_prediction"
                 script {
-                    if (shouldStop()) {
-                        deployment_prediction = 'Failure'
-                        error("Stopping pipeline due to failure in Prereqs Stage.")
+                    // Execute the shell script and capture the deployment prediction
+                    def deployment_prediction = sh(
+                        script: '''
+                        # Extract API key
+                        API_KEY=$(echo $MY_PASSWORD | cut -d':' -f2)
+                        export API_KEY
+                        
+                        # App name and Prometheus query
+                        app_name="qotd-python"
+                        PROMETHEUS_URL="http://9.30.96.66:9090"
+                        QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
+
+                        # Get network load from Prometheus
+                        result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
+                        network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
+                        echo "Network load is $network_load"
+
+                        # Read deployment status
+                        status=$(cat deployment_status.log)
+
+                        # Call Python script to predict deployment outcome
+                        deployment_prediction=$(python UC_pipeline_management.py "$network_load" "$status")
+                        echo "$deployment_prediction"
+                        ''',
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Deployment prediction is: ${deployment_prediction}"
+
+                    // Stop pipeline if prediction indicates failure
+                    if (deployment_prediction == 'Failure') {
+                        error("Stopping pipeline due to predicted deployment failure.")
                     }
-                '''
+                }
             }
         }
+
+
 
         stage('Deploy the sample app') {
             steps {
