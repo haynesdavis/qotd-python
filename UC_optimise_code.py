@@ -29,4 +29,5 @@ with open('/tmp/code_optimisations.txt', 'w') as file:
     file.write(sonarqube_response.text + '\n\n')
 
 
-    # json.dump(sonarqube_response.text, file, indent=4) 
+with open('/tmp/code_optimisations.txt', 'a') as file:
+    json.dump(sonarqube_response.text, file, indent=4) 
