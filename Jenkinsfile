@@ -70,7 +70,6 @@ pipeline {
                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=SmpleApp \
                     -Dsonar.sources=. \
-                    -Dsonar.branch.name=${env.BRANCH_NAME}
                     """
                 }
             }
