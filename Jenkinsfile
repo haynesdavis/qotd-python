@@ -69,7 +69,7 @@ pipeline {
                     sh """
                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=SmpleApp \
-                    -Dsonar.sources=src \
+                    -Dsonar.sources=. \
                     -Dsonar.branch.name=${env.BRANCH_NAME}
                     """
                 }
