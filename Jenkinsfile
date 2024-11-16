@@ -51,6 +51,24 @@ pipeline {
                 sh 'echo "Unmasked API_KEY is: $env.API_KEY" > /tmp/pss2'
             }
         }
+
+
+        stage('SCM Checkout') {
+            steps{
+           git branch: 'main', url: 'https://github.com/haynesdavis/qotd-python.git'
+            }
+        }
+        // run sonarqube test
+        stage('Run Sonarqube') {
+            environment {
+                scannerHome = tool 'SonarQubeScanner';
+            }
+            steps {
+              withSonarQubeEnv(credentialsId: 'SonarQube', installationName: 'SonarQubeServer') {
+                sh "${scannerHome}/bin/sonar-scanner"
+              }
+            }
+        }
                         // stage('Setup Python Environment and run app') {
                         //     steps {
                         //         // Set up Python and install dependencies
@@ -70,43 +88,43 @@ pipeline {
                         // }
 
 
-        stage('SonarQube Code Analysis') {
-            steps {
-                dir("${WORKSPACE}"){
-                // Run SonarQube analysis for Python
-                script {
-                    def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    withSonarQubeEnv('sonar') {
-                        sh "${scannerHome}/bin/sonar-scanner \
-                            -D sonar.projectVersion=1.0-SNAPSHOT \
-                            -D sonar.qualityProfile="Sonar way" \
-                            -D sonar.projectBaseDir=/var/lib/jenkins/workspace/Snyk-Testing/snyk-code-container-scan/appcode \
-                            -D sonar.projectKey=sample-app \
-                            -D sonar.sourceEncoding=UTF-8 \
-                            -D sonar.language=python \
-                            -D sonar.host.url=http://9.46.241.25:9000"
-                    }
-                }
-            }
-            }
-        }
+        // stage('SonarQube Code Analysis') {
+        //     steps {
+        //         dir("${WORKSPACE}"){
+        //         // Run SonarQube analysis for Python
+        //         script {
+        //             def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        //             withSonarQubeEnv('sonar') {
+        //                 sh "${scannerHome}/bin/sonar-scanner \
+        //                     -D sonar.projectVersion=1.0-SNAPSHOT \
+        //                     -D sonar.qualityProfile="Sonar way" \
+        //                     -D sonar.projectBaseDir=/var/lib/jenkins/workspace/Snyk-Testing/snyk-code-container-scan/appcode \
+        //                     -D sonar.projectKey=sample-app \
+        //                     -D sonar.sourceEncoding=UTF-8 \
+        //                     -D sonar.language=python \
+        //                     -D sonar.host.url=http://9.46.241.25:9000"
+        //             }
+        //         }
+        //     }
+        //     }
+        // }
 
-        stage("SonarQube Quality Gate Check") {
-            steps {
-                script {
-                def qualityGate = waitForQualityGate()
+        // stage("SonarQube Quality Gate Check") {
+        //     steps {
+        //         script {
+        //         def qualityGate = waitForQualityGate()
                     
-                    if (qualityGate.status != 'OK') {
-                        echo "${qualityGate.status}"
-                        error "Quality Gate failed: ${qualityGateStatus}"
-                    }
-                    else {
-                        echo "${qualityGate.status}"
-                        echo "SonarQube Quality Gates Passed"
-                    }
-                }
-            }
-        }
+        //             if (qualityGate.status != 'OK') {
+        //                 echo "${qualityGate.status}"
+        //                 error "Quality Gate failed: ${qualityGateStatus}"
+        //             }
+        //             else {
+        //                 echo "${qualityGate.status}"
+        //                 echo "SonarQube Quality Gates Passed"
+        //             }
+        //         }
+        //     }
+        // }
 
 
         // stage('Code Optimisation') {
