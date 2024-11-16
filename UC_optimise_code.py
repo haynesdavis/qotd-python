@@ -16,7 +16,7 @@ genai_response = model.generate_content(f"Below given is a python code. Optimise
 
 SONARQUBE_CREDS = sys.argv[1]
 
-url = "http://9.46.241.25:9000/api/project_branches/list?project=SmpleApp"
+url = "http://9.46.241.25:9000/api/hotspots/search?inNewCodePeriod=false&onlyMine=false&p=1&project=SmpleApp&ps=500&status=TO_REVIEW"
 headers = {'Authorization': f'Basic {SONARQUBE_CREDS}'}
 
 sonarqube_response = requests.get(url, headers=headers)
