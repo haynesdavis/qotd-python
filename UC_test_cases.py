@@ -17,5 +17,5 @@ lines = [line for line in lines if '```' not in line]
 filtered_code = '\n'.join(lines)
 print(filtered_code)
 # Open file in write mode
-with open("test_case.py", "w") as file:
+with open("/tmp/test_case.py", "w") as file:
     file.write(f"{filtered_code}")
