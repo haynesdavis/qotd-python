@@ -1,9 +1,7 @@
 pipeline {
-    // agent { docker { image 'python-docker-3.12.6-alpine3.20:v6' } }
     agent any
     environment {
         MY_PASSWORD = credentials('af5bdc2b-124d-44ab-a094-d04b567261b9')
-        // API_KEY="test"
         SONARQUBE_CREDS = credentials('SonarQubeBase64')
 
     }
@@ -20,38 +18,17 @@ pipeline {
                 }
             }
         }
-        // stage('Extract API Key') {
+
+
+        // stage('Checkout') {
         //     steps {
-        //         script {
-        //             // Define the string containing the API key
-        //             def apiKeyString = $MY_PASSWORD
-                    
-        //             // Extract the API key using awk
-        //             def extractedApiKey = sh(
-        //                 script: "echo '${apiKeyString}' | awk -F':' '{print \$2}'",
-        //                 returnStdout: true
-        //             ).trim()
-                    
-        //             // Assign the extracted API key to an environment variable
-        //             env.API_KEY = extractedApiKey
-                    
-        //             // Optionally, print the API key (Be cautious with sensitive data)
-        //             echo "API Key extracted successfully."
-        //         }
+        //         // Pull the source code from the repository (e.g., GitHub)
+        //         sh 'git clone https://github.com/haynesdavis/qotd-python.git'
+        //         sh 'git branch'
+        //         sh 'git checkout jenkins-pipeline-test'
+        //         sh 'git branch'
         //     }
         // }
-
-
-        stage('Checkout') {
-            steps {
-                // Pull the source code from the repository (e.g., GitHub)
-                sh 'git clone https://github.com/haynesdavis/qotd-python.git'
-                sh 'git branch'
-                sh 'git checkout jenkins-pipeline-test'
-                sh 'git branch'
-                sh 'echo "Unmasked API_KEY is: $env.API_KEY" > /tmp/pss2'
-            }
-        }
 
 
         stage('SCM Checkout') {
@@ -109,56 +86,56 @@ pipeline {
                         // }
 
 
-        // stage('SonarQube Code Analysis') {
+                                // stage('SonarQube Code Analysis') {
+                                //     steps {
+                                //         dir("${WORKSPACE}"){
+                                //         // Run SonarQube analysis for Python
+                                //         script {
+                                //             def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                                //             withSonarQubeEnv('sonar') {
+                                //                 sh "${scannerHome}/bin/sonar-scanner \
+                                //                     -D sonar.projectVersion=1.0-SNAPSHOT \
+                                //                     -D sonar.qualityProfile="Sonar way" \
+                                //                     -D sonar.projectBaseDir=/var/lib/jenkins/workspace/Snyk-Testing/snyk-code-container-scan/appcode \
+                                //                     -D sonar.projectKey=sample-app \
+                                //                     -D sonar.sourceEncoding=UTF-8 \
+                                //                     -D sonar.language=python \
+                                //                     -D sonar.host.url=http://9.46.241.25:9000"
+                                //             }
+                                //         }
+                                //     }
+                                //     }
+                                // }
+
+                                // stage("SonarQube Quality Gate Check") {
+                                //     steps {
+                                //         script {
+                                //         def qualityGate = waitForQualityGate()
+                                            
+                                //             if (qualityGate.status != 'OK') {
+                                //                 echo "${qualityGate.status}"
+                                //                 error "Quality Gate failed: ${qualityGateStatus}"
+                                //             }
+                                //             else {
+                                //                 echo "${qualityGate.status}"
+                                //                 echo "SonarQube Quality Gates Passed"
+                                //             }
+                                //         }
+                                //     }
+                                // }
+
+
+        // stage('Code Optimisation') {
         //     steps {
-        //         dir("${WORKSPACE}"){
-        //         // Run SonarQube analysis for Python
-        //         script {
-        //             def scannerHome = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-        //             withSonarQubeEnv('sonar') {
-        //                 sh "${scannerHome}/bin/sonar-scanner \
-        //                     -D sonar.projectVersion=1.0-SNAPSHOT \
-        //                     -D sonar.qualityProfile="Sonar way" \
-        //                     -D sonar.projectBaseDir=/var/lib/jenkins/workspace/Snyk-Testing/snyk-code-container-scan/appcode \
-        //                     -D sonar.projectKey=sample-app \
-        //                     -D sonar.sourceEncoding=UTF-8 \
-        //                     -D sonar.language=python \
-        //                     -D sonar.host.url=http://9.46.241.25:9000"
-        //             }
-        //         }
-        //     }
+        //         sh '''
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         echo "this is just a test comment added to amke sure there is a code change"
+
+        //         python UC_optimise_code.py $SONARQUBE_CREDS
+        //         '''
         //     }
         // }
-
-        // stage("SonarQube Quality Gate Check") {
-        //     steps {
-        //         script {
-        //         def qualityGate = waitForQualityGate()
-                    
-        //             if (qualityGate.status != 'OK') {
-        //                 echo "${qualityGate.status}"
-        //                 error "Quality Gate failed: ${qualityGateStatus}"
-        //             }
-        //             else {
-        //                 echo "${qualityGate.status}"
-        //                 echo "SonarQube Quality Gates Passed"
-        //             }
-        //         }
-        //     }
-        // }
-
-
-        stage('Code Optimisation') {
-            steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                echo "this is just a test comment added to amke sure there is a code change"
-
-                python UC_optimise_code.py $SONARQUBE_CREDS
-                '''
-            }
-        }
 
 
         stage('Test Case Generation') {
