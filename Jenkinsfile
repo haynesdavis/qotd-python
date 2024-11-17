@@ -198,7 +198,7 @@ pipeline {
                 result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
                 echo $result
                 cpu_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
-                echo "value is $cpu_load"
+                echo "cpu_load is $cpu_load"
 
                 API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
                 export API_KEY

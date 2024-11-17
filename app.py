@@ -38,7 +38,7 @@ quotes = [
 
 @app.route('/', methods=['GET'])
 def home():
-    response = make_response(f"This is the response from sample app. App version is VERSION.\n")
+    response = make_response(f"This is the response from sample app. App version is VERSION. App has failed\n")
     response.mimetype = "text/plain"
     return prepareResponse(response)
 
