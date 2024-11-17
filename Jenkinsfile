@@ -161,15 +161,15 @@ pipeline {
         }
 
 
-        // stage('Test Case Generation') {
-        //     steps {
-        //         sh '''
-        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-        //         export API_KEY
-        //         python UC_test_cases.py
-        //         '''
-        //     }
-        // }
+        stage('Test Case Generation') {
+            steps {
+                sh '''
+                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                export API_KEY
+                python UC_test_cases.py
+                '''
+            }
+        }
 
                         // stage('Check Prereqs for deployment') {
                         //     steps {
