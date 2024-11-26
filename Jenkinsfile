@@ -25,36 +25,34 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            environment {
-                SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
-            }
-            steps {
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh """
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=SmpleApp \
-                    -Dsonar.sources=. \
-                    """
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     environment {
+        //         SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQubeServer') {
+        //             sh """
+        //             ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+        //             -Dsonar.projectKey=SmpleApp \
+        //             -Dsonar.sources=. \
+        //             """
+        //         }
+        //     }
+        // }
 
 
 
-        stage('Code Optimisation') {
-            steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                echo "this is just a test comment added to amke sure there is a code change"
+        // stage('Code Optimisation') {
+        //     steps {
+        //         sh '''
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         echo "this is just a test comment added to amke sure there is a code change"
 
-                python UC_optimise_code.py $SONARQUBE_CREDS
-
-                echo "Report can be viewed at /tmp/code_optimisations.txt"
-                '''
-            }
-        }
+        //         python UC_optimise_code.py $SONARQUBE_CREDS
+        //         '''
+        //     }
+        // }
 
 
         // stage('Test Case Generation') {
@@ -90,45 +88,45 @@ pipeline {
                         // }
 
 
-        // stage('Check Prereqs for deployment') {
-        //     steps {
-        //         script {
-        //             // Execute the shell script and capture the deployment prediction
-        //             def deployment_prediction = sh(
-        //                 script: '''
-        //                 # Extract API key
-        //                 API_KEY=$(echo $MY_PASSWORD | cut -d':' -f2)
-        //                 export API_KEY
+        stage('Check Prereqs for deployment') {
+            steps {
+                script {
+                    // Execute the shell script and capture the deployment prediction
+                    def deployment_prediction = sh(
+                        script: '''
+                        # Extract API key
+                        API_KEY=$(echo $MY_PASSWORD | cut -d':' -f2)
+                        export API_KEY
                         
-        //                 # App name and Prometheus query
-        //                 app_name="qotd-python"
-        //                 PROMETHEUS_URL="http://9.30.96.66:9090"
-        //                 QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
+                        # App name and Prometheus query
+                        app_name="qotd-python"
+                        PROMETHEUS_URL="http://9.30.96.66:9090"
+                        QUERY='query=network_load{instance="9.46.241.25:10002", job="network_load"}'
 
-        //                 # Get network load from Prometheus
-        //                 result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
-        //                 network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
+                        # Get network load from Prometheus
+                        result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
+                        network_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
 
-        //                 # Read deployment status
-        //                 status=$(cat UC_deployment_status.log)
+                        # Read deployment status
+                        status=$(cat UC_deployment_status.log)
 
-        //                 # Call Python script to predict deployment outcome
-        //                 deployment_prediction=$(python UC_pipeline_management.py "$network_load" "$status")
-        //                 echo "$deployment_prediction"
-        //                 ''',
-        //                 returnStdout: true
-        //             ).trim()
+                        # Call Python script to predict deployment outcome
+                        deployment_prediction=$(python UC_pipeline_management.py "$network_load" "$status")
+                        echo "$deployment_prediction"
+                        ''',
+                        returnStdout: true
+                    ).trim()
 
-        //             echo "Deployment prediction is: ${deployment_prediction}"
-        //             if (deployment_prediction == 'Failure') {
-        //                 error("Stopping pipeline due to predicted deployment failure.")
-        //             } else {
-        //                 echo "Deployment prediction is successful. Proceeding with pipeline execution."
-        //             }
+                    echo "Deployment prediction is: ${deployment_prediction}"
+                    if (deployment_prediction == 'Failure') {
+                        error("Stopping pipeline due to predicted deployment failure.")
+                    } else {
+                        echo "Deployment prediction is successful. Proceeding with pipeline execution."
+                    }
 
-        //         }
-        //     }
-        // }
+                }
+            }
+        }
 
         // stage('build') {
         //     steps {
