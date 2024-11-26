@@ -42,30 +42,28 @@ pipeline {
 
 
 
-        stage('Code Optimisation') {
-            steps {
-                sh '''
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                echo "this is just a test comment added to amke sure there is a code change"
-
-                python UC_optimise_code.py $SONARQUBE_CREDS
-
-                echo "Report can be viewed at /tmp/code_optimisations.txt"
-                '''
-            }
-        }
-
-
-        // stage('Test Case Generation') {
+        // stage('Code Optimisation') {
         //     steps {
         //         sh '''
         //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
         //         export API_KEY
-        //         python UC_test_cases.py
+        //         echo "this is just a test comment added to amke sure there is a code change"
+
+        //         python UC_optimise_code.py $SONARQUBE_CREDS
         //         '''
         //     }
         // }
+
+
+        stage('Test Case Generation') {
+            steps {
+                sh '''
+                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                export API_KEY
+                python UC_test_cases.py
+                '''
+            }
+        }
 
                         // stage('Check Prereqs for deployment') {
                         //     steps {
