@@ -25,34 +25,36 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Analysis') {
-        //     environment {
-        //         SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
-        //     }
-        //     steps {
-        //         withSonarQubeEnv('SonarQubeServer') {
-        //             sh """
-        //             ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-        //             -Dsonar.projectKey=SmpleApp \
-        //             -Dsonar.sources=. \
-        //             """
-        //         }
-        //     }
-        // }
+        stage('SonarQube Analysis') {
+            environment {
+                SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
+            }
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                    sh """
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=SmpleApp \
+                    -Dsonar.sources=. \
+                    """
+                }
+            }
+        }
 
 
 
-        // stage('Code Optimisation') {
-        //     steps {
-        //         sh '''
-        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-        //         export API_KEY
-        //         echo "this is just a test comment added to amke sure there is a code change"
+        stage('Code Optimisation') {
+            steps {
+                sh '''
+                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+                export API_KEY
+                echo "this is just a test comment added to amke sure there is a code change"
 
-        //         python UC_optimise_code.py $SONARQUBE_CREDS
-        //         '''
-        //     }
-        // }
+                python UC_optimise_code.py $SONARQUBE_CREDS
+
+                echo "Report can be viewed at /tmp/code_optimisations.txt"
+                '''
+            }
+        }
 
 
         // stage('Test Case Generation') {
@@ -128,118 +130,117 @@ pipeline {
         //     }
         // }
 
-        stage('build') {
-            steps {
-                sh '''
-                docker images
-                app_name="qotd-python"
-                latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
-                current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
-                next_version=$((current_version + 1))
-                sed -i "s/VERSION/$next_version/" app.py
-                docker build -t "$app_name:v$next_version" .
-                docker images
-                '''
-            }
-        }
+        // stage('build') {
+        //     steps {
+        //         sh '''
+        //         docker images
+        //         app_name="qotd-python"
+        //         latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
+        //         current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
+        //         next_version=$((current_version + 1))
+        //         sed -i "s/VERSION/$next_version/" app.py
+        //         docker build -t "$app_name:v$next_version" .
+        //         docker images
+        //         '''
+        //     }
+        // }
 
 
-        stage('Deploy the sample app') {
-            steps {
-                sh '''
-                app_name="qotd-python"
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
+        // stage('Deploy the sample app') {
+        //     steps {
+        //         sh '''
+        //         app_name="qotd-python"
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
 
-                if docker ps --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
-                    echo "Stopping the container qotd-python..."
-                    docker stop qotd-python
-                    echo "Container qotd-python stopped."
-                else
-                    echo "Container qotd-python does not exist or is not running."
-                fi
+        //         if docker ps --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
+        //             echo "Stopping the container qotd-python..."
+        //             docker stop qotd-python
+        //             echo "Container qotd-python stopped."
+        //         else
+        //             echo "Container qotd-python does not exist or is not running."
+        //         fi
 
-                if docker ps -a --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
-                    echo "Removing the container qotd-python..."
-                    docker remove $app_name
-                    echo "Container qotd-python removed."
-                else
-                    echo "Container qotd-python does not exist or is not running."
-                fi
+        //         if docker ps -a --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
+        //             echo "Removing the container qotd-python..."
+        //             docker remove $app_name
+        //             echo "Container qotd-python removed."
+        //         else
+        //             echo "Container qotd-python does not exist or is not running."
+        //         fi
 
                 
-                latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
-                current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
-                docker run -d --name $app_name -p 10000:10000 "$app_name:v$current_version"
-                if docker ps --filter "name=$app_name" --filter "status=running" | grep -q "$app_name"; then
-                echo "Container '$app_name' is running successfully."
-                deployment_status="success"
-                network_load=$(curl -s http://9.46.241.25:10002/metrics | cut -d' ' -f2)
-                status="{deployment_status: $deployment_status, data: {network_load: $network_load}}"
-                echo $status >> deployment_status.log
-                else
-                echo "Container '$app_name' is not running."
-                fi
+        //         latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
+        //         current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
+        //         docker run -d --name $app_name -p 10000:10000 "$app_name:v$current_version"
+        //         if docker ps --filter "name=$app_name" --filter "status=running" | grep -q "$app_name"; then
+        //         echo "Container '$app_name' is running successfully."
+        //         deployment_status="success"
+        //         network_load=$(curl -s http://9.46.241.25:10002/metrics | cut -d' ' -f2)
+        //         status="{deployment_status: $deployment_status, data: {network_load: $network_load}}"
+        //         echo $status >> deployment_status.log
+        //         else
+        //         echo "Container '$app_name' is not running."
+        //         fi
 
-                '''
-            }
-        }
+        //         '''
+        //     }
+        // }
 
-        stage('Rollback on failure') {
-            steps {
-                sh '''
-                sleep 30
-                app_name="qotd-python"
+        // stage('Rollback on failure') {
+        //     steps {
+        //         sh '''
+        //         sleep 30
+        //         app_name="qotd-python"
 
-                app_response=$(curl -s localhost:10000)
-                echo "app_response is - $app_response"
-                PROMETHEUS_URL="http://9.30.96.66:9090"
-                QUERY='query=cpu_load_state{instance="9.46.241.25:10001", job="cpu_load"}'
-                result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
-                echo $result
-                cpu_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
-                echo "cpu_load is $cpu_load"
+        //         app_response=$(curl -s localhost:10000)
+        //         echo "app_response is - $app_response"
+        //         PROMETHEUS_URL="http://9.30.96.66:9090"
+        //         QUERY='query=cpu_load_state{instance="9.46.241.25:10001", job="cpu_load"}'
+        //         result=$(curl -s -G "${PROMETHEUS_URL}/api/v1/query" --data-urlencode "${QUERY}")
+        //         echo $result
+        //         cpu_load=$(echo "$result" | jq -r '.data.result[0].value[1]')
+        //         echo "cpu_load is $cpu_load"
 
-                API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
-                export API_KEY
-                app_running=$(python UC_rollback_deployment.py "${cpu_load}" "${app_response}" | sed -n '2p')
+        //         API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
+        //         export API_KEY
+        //         app_running=$(python UC_rollback_deployment.py "${cpu_load}" "${app_response}" | sed -n '2p')
 
-                echo "Is app running healthy: ${app_running}"
                 
-                if ${app_running}; then
-                    echo "App is healthy"
-                else
-                    echo "App is not healthy, rolling back..."
+        //         if $app_running; then
+        //             echo "App is healthy"
+        //         else
+        //             echo "App is not healthy, rolling back..."
 
-                    latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
-                    current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
-                    prev_version=$((current_version - 1))
+        //             latest_version=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep '^qotd-python:v' | sort -V | tail -n 1)
+        //             current_version=$(echo "$latest_version" | grep -oP '(?<=:v)[0-9]+')
+        //             prev_version=$((current_version - 1))
 
-                    if docker ps --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
-                        echo "Stopping the container qotd-python..."
-                        docker stop qotd-python
-                        echo "Container qotd-python stopped."
-                    else
-                        echo "Container qotd-python does not exist or is not running."
-                    fi
+        //             if docker ps --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
+        //                 echo "Stopping the container qotd-python..."
+        //                 docker stop qotd-python
+        //                 echo "Container qotd-python stopped."
+        //             else
+        //                 echo "Container qotd-python does not exist or is not running."
+        //             fi
 
-                    if docker ps -a --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
-                        echo "Removing the container qotd-python..."
-                        docker remove $app_name
-                        echo "Container qotd-python removed."
-                    else
-                        echo "Container qotd-python does not exist or is not running."
-                    fi
+        //             if docker ps -a --filter "name=qotd-python" --format "{{.Names}}" | grep -q "^qotd-python$"; then
+        //                 echo "Removing the container qotd-python..."
+        //                 docker remove $app_name
+        //                 echo "Container qotd-python removed."
+        //             else
+        //                 echo "Container qotd-python does not exist or is not running."
+        //             fi
 
-                    docker run -d --name $app_name -p 10000:10000 "$app_name:v$prev_version"
-                fi
-                sleep 10
-                app_response=$(curl -s localhost:10000)
-                echo $app_response
+        //             docker run -d --name $app_name -p 10000:10000 "$app_name:v$prev_version"
+        //         fi
+        //         sleep 10
+        //         app_response=$(curl -s localhost:10000)
+        //         echo $app_response
 
-                '''
-            }
-        }
+        //         '''
+        //     }
+        // }
 
 
     }
