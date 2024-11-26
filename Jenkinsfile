@@ -204,8 +204,9 @@ pipeline {
                 export API_KEY
                 app_running=$(python UC_rollback_deployment.py "${cpu_load}" "${app_response}" | sed -n '2p')
 
+                echo "Is app running healthy: ${app_running}"
                 
-                if $app_running; then
+                if ${app_running}; then
                     echo "App is healthy"
                 else
                     echo "App is not healthy, rolling back..."
