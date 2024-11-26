@@ -61,6 +61,7 @@ pipeline {
                 API_KEY=$(echo $MY_PASSWORD| cut -d':' -f2)
                 export API_KEY
                 python UC_test_cases.py
+                echo "Test cases are copied to /tmp/test_case.py"
                 '''
             }
         }
