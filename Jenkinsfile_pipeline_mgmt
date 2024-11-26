@@ -25,20 +25,20 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            environment {
-                SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
-            }
-            steps {
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh """
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=SmpleApp \
-                    -Dsonar.sources=. \
-                    """
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     environment {
+        //         SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
+        //     }
+        //     steps {
+        //         withSonarQubeEnv('SonarQubeServer') {
+        //             sh """
+        //             ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+        //             -Dsonar.projectKey=SmpleApp \
+        //             -Dsonar.sources=. \
+        //             """
+        //         }
+        //     }
+        // }
 
 
 
